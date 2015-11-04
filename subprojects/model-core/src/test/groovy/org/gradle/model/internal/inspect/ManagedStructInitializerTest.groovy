@@ -33,7 +33,7 @@ import spock.lang.Unroll
 
 import java.util.concurrent.atomic.AtomicInteger
 
-class ManagedModelInitializerTest extends Specification {
+class ManagedStructInitializerTest extends Specification {
 
     def store = DefaultModelSchemaStore.instance
     def nodeInitializerRegistry

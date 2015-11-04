@@ -36,7 +36,7 @@ class DefaultLibrarySourceSet extends BaseLanguageSourceSet implements LibrarySo
 
 class DefaultSampleBinary extends BaseBinarySpec implements SampleBinary {}
 
-class OtherSampleBinaryImpl extends BaseBinarySpec implements OtherSampleBinary {}
+class OtherSampleBinaryImpl extends DefaultSampleBinary implements OtherSampleBinary {}
 
 interface SampleLibrary extends ComponentSpec {}
 

@@ -27,9 +27,9 @@ import org.gradle.model.internal.manage.schema.ModelSchemaStore;
 import java.util.Collections;
 import java.util.List;
 
-public class ManagedModelInitializer<T> extends AbstractManagedModelInitializer<T> {
+public class ManagedStructInitializer<T> extends AbstractStructInitializer<T> {
 
-    public ManagedModelInitializer(ManagedImplStructSchema<T> modelSchema, ModelSchemaStore schemaStore, ManagedProxyFactory proxyFactory) {
+    public ManagedStructInitializer(ManagedImplStructSchema<T> modelSchema, ModelSchemaStore schemaStore, ManagedProxyFactory proxyFactory) {
         super(modelSchema, schemaStore, proxyFactory);
     }
 

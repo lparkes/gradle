@@ -33,6 +33,8 @@ public interface InstanceFactory<T> {
 
     <S extends T> TypeRegistrationBuilder<S> register(ModelType<S> publicType, ModelRuleDescriptor sourceRule);
 
+    <S extends T> ModelType<? extends S> getImplementationType(ModelType<S> publicType);
+
     <S extends T> Set<ModelType<?>> getInternalViews(ModelType<S> type);
     
     <S extends T> Set<ModelProperty<?>> getHiddenProperties(ModelType<S> type, ModelSchemaStore schemaStore);
@@ -40,7 +42,7 @@ public interface InstanceFactory<T> {
     /**
      * Return information about the implementation of a managed type with an unmanaged super-type.
      */
-    <S extends T> ManagedSubtypeImplementationInfo<? extends T> getManagedSubtypeImplementationInfo(ModelType<S> managedType);
+    <S extends T> ImplementationInfo<? extends T> getImplementationInfo(ModelType<S> managedType);
 
     void validateRegistrations();
 
@@ -50,7 +52,7 @@ public interface InstanceFactory<T> {
         TypeRegistrationBuilder<T> withInternalView(ModelType<?> internalView);
     }
 
-    interface ManagedSubtypeImplementationInfo<T> {
+    interface ImplementationInfo<T> {
         /**
          * The public type that has a registered default implementation that can be used to create the delegate for the managed subtype.
          */

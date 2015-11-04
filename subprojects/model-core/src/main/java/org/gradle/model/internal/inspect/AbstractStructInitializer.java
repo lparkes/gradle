@@ -26,13 +26,13 @@ import org.gradle.model.internal.type.ModelType;
 
 import java.util.Collection;
 
-public abstract class AbstractManagedModelInitializer<T> implements NodeInitializer {
+public abstract class AbstractStructInitializer<T> implements NodeInitializer {
 
-    protected final ManagedImplStructSchema<T> schema;
+    protected final StructSchema<T> schema;
     protected final ModelSchemaStore schemaStore;
     protected final ManagedProxyFactory proxyFactory;
 
-    public AbstractManagedModelInitializer(ManagedImplStructSchema<T> schema, ModelSchemaStore schemaStore, ManagedProxyFactory proxyFactory) {
+    public AbstractStructInitializer(StructSchema<T> schema, ModelSchemaStore schemaStore, ManagedProxyFactory proxyFactory) {
         this.schema = schema;
         this.schemaStore = schemaStore;
         this.proxyFactory = proxyFactory;
@@ -92,16 +92,16 @@ public abstract class AbstractManagedModelInitializer<T> implements NodeInitiali
             }
         } else {
             ModelProjection projection = new UnmanagedModelProjection<P>(propertyType, true, true);
-            ModelRegistrations.Builder registrationBuilder;
+            ModelRegistrations.Builder creatorBuilder;
             if (shouldHaveANodeInitializer(property, propertySchema)) {
-                registrationBuilder = ModelRegistrations.of(childPath, nodeInitializerRegistry.getNodeInitializer(NodeInitializerContext.forProperty(propertyType, property, schema.getType())));
+                creatorBuilder = ModelRegistrations.of(childPath, nodeInitializerRegistry.getNodeInitializer(NodeInitializerContext.forProperty(propertyType, property, schema.getType())));
             } else {
-                registrationBuilder = ModelRegistrations.of(childPath);
+                creatorBuilder = ModelRegistrations.of(childPath);
             }
-            registrationBuilder
+            creatorBuilder
                 .withProjection(projection)
                 .descriptor(descriptor);
-            modelNode.addLink(registrationBuilder.build());
+            modelNode.addLink(creatorBuilder.build());
         }
     }
 
@@ -131,6 +131,10 @@ public abstract class AbstractManagedModelInitializer<T> implements NodeInitiali
     }
 
     private <P> boolean shouldHaveANodeInitializer(ModelProperty<P> property, ModelSchema<P> propertySchema) {
-        return !(propertySchema instanceof ValueSchema) && !property.isDeclaredAsHavingUnmanagedType();
+        return !isAModelValueSchema(propertySchema) && !property.isDeclaredAsHavingUnmanagedType();
+    }
+
+    private <P> boolean isAModelValueSchema(ModelSchema<P> propertySchema) {
+        return propertySchema instanceof ValueSchema;
     }
 }

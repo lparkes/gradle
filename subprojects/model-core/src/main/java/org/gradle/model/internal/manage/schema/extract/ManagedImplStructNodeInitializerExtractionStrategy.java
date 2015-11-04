@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.gradle.internal.Cast;
 import org.gradle.model.Managed;
 import org.gradle.model.internal.core.NodeInitializer;
-import org.gradle.model.internal.inspect.ManagedModelInitializer;
+import org.gradle.model.internal.inspect.ManagedStructInitializer;
 import org.gradle.model.internal.manage.instance.ManagedProxyFactory;
 import org.gradle.model.internal.manage.schema.ManagedImplStructSchema;
 import org.gradle.model.internal.manage.schema.ModelSchema;
@@ -50,7 +50,7 @@ public class ManagedImplStructNodeInitializerExtractionStrategy implements NodeI
             return null;
         }
         ManagedImplStructSchema<T> managedSchema = Cast.<ManagedImplStructSchema<T>>uncheckedCast(schema);
-        return new ManagedModelInitializer<T>(managedSchema, schemaStore, proxyFactory);
+        return new ManagedStructInitializer<T>(managedSchema, schemaStore, proxyFactory);
     }
 
     @Override
