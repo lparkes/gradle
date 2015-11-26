@@ -10,7 +10,7 @@ Note: this spec is very much a work in progress.
 
 AKA 'Ivy deliver'. In this instance, dependency declarations in the generated descriptors should use the resolved versions that were used to build the artifacts.
 
-## I want to customize the Ivy or Maven meta-data for a publication
+## I want to customize the Ivy or Maven metadata for a publication
 
 * Use a (groupId, artifactId, version) identifier that is different to defaults.
 * Add some custom Ivy attributes for the module or a configuration or an artifact.
@@ -29,9 +29,9 @@ AKA 'Ivy deliver'. In this instance, dependency declarations in the generated de
   and to `mylib-1.2-x86.dll` and `mylib-1.2-amd64.dll` when publishing to a Maven repository.
 * I want a consumer in a different build to use the JAR file, and a consumer in the same build to use the compiled classes dir.
 
-## I want to generate the meta-data descriptor for a publication without publishing
+## I want to generate the metadata descriptor for a publication without publishing
 
-* To smoke test the generated meta-data before publishing.
+* To smoke test the generated metadata before publishing.
 
 ## I want to sign the artifacts when published
 
@@ -51,7 +51,7 @@ Both of these are defined in the [dependency model spec](dependency-model.md).
 
 A component is a logical piece of software, such as a Java library or native executable or report.
 
-A publication is a mapping of that component to a set of artifacts and meta-data, ready to be used by some consumer project. A publication is a
+A publication is a mapping of that component to a set of artifacts and metadata, ready to be used by some consumer project. A publication is a
 strongly-typed model element. There will initially be 3 types of publication:
 
 * An Ivy publication, for publishing to an Ivy repository.
@@ -72,7 +72,7 @@ See [completed stories](done/publication-model.md)
 
 ## Customizing the Maven and Ivy publication identifier
 
-This step will allow some basic customization of the meta data model for each publication:
+This step will allow some basic customization of the metadata model for each publication:
 
 1. Add `groupId`, `artifactId`, `version` properties to `MavenPublication`. Add `packaging` property to `MavenPom`.
 2. Change `pom.xml` generation to use these properties.
@@ -187,7 +187,7 @@ Validate the following prior to publication:
 
 * The extension, classifier specified for a Maven artifact are non-empty strings.
 * The name, extension, type, and classifier if specified, for an Ivy artifact are non-empty strings.
-* When publishing to a repository, validate that each artifact (including the meta-data file) will be published as a separate resource.
+* When publishing to a repository, validate that each artifact (including the metadata file) will be published as a separate resource.
 
 ### Test cases
 
@@ -454,9 +454,9 @@ These would be mixed in to various steps above (TBD), rather than as one change 
 8. Deprecate and later remove `Configuration` and related types.
 9. Deprecate and later remove support for resolving or publishing using an Ivy DependencyResolver implementation.
 
-## Add further meta-data customizations
+## Add further metadata customizations
 
-At any point above, and as required, more meta-data for a publication can be made available for customization. In particular:
+At any point above, and as required, more metadata for a publication can be made available for customization. In particular:
 
 1. Add `name`, `description`, `url`, `licenses`, `organization`, `scm`, `issueManagement` and `mailingLists` to `MavenPublication`
 2. Add extended attributes to `IvyModuleDescriptor`, `IvyConfiguration` and `IvyArtifact`.

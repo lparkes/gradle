@@ -18,7 +18,11 @@ package org.gradle.integtests.publish.maven
 import org.gradle.integtests.fixtures.AbstractIntegrationSpec
 
 class MavenJavaProjectPublishIntegrationTest extends AbstractIntegrationSpec {
-    public void "can publish jar and meta-data to maven repository"() {
+    def setup() {
+        overrideMavenLocal()
+    }
+
+    public void "can publish jar and metadata to maven repository"() {
         given:
         file("settings.gradle") << "rootProject.name = 'publishTest' "
 

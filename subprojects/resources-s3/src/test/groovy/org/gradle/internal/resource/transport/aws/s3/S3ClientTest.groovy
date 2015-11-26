@@ -159,7 +159,7 @@ class S3ClientTest extends Specification {
         "mydomain.com"                                           | Optional.absent()
     }
 
-    def "should include uri when meta-data not found"() {
+    def "should include uri when metadata not found"() {
         AmazonS3Client amazonS3Client = Mock()
         URI uri = new URI("https://somehost/file.txt")
         S3Client s3Client = new S3Client(amazonS3Client, s3ConnectionProperties)
