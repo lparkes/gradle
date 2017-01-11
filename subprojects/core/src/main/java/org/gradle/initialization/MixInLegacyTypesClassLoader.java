@@ -78,8 +78,6 @@ public class MixInLegacyTypesClassLoader extends TransformingClassLoader {
         /*
          * This classloader is thread-safe and TransformingClassLoader is parallel capable,
          * so register as such to reduce contention when running multithreaded builds.
-         * We do so through relfection since Gradle should print error messages when
-         * run with older JRE versions
         */
         if (JavaVersion.current().isJava7Compatible()) {
             ClassLoader.registerAsParallelCapable();
