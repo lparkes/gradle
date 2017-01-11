@@ -17,12 +17,11 @@
 package org.gradle.api.internal.tasks.compile;
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass;
+import org.gradle.api.JavaVersion;
 import org.gradle.internal.classloader.TransformingClassLoader;
 import org.gradle.internal.classpath.ClassPath;
 import org.objectweb.asm.*;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,15 +39,8 @@ class GroovyCompileTransformingClassLoader extends TransformingClassLoader {
          * We do so through relfection since Gradle should print error messages when
          * run with older JRE versions
         */
-        try {
-            Method m = ClassLoader.class.getMethod("registerAsParallelCapable");
-            m.invoke(null);
-        } catch (InvocationTargetException e) {
-            // Ignored, we are simply running an old Java version
-        } catch (IllegalAccessException e) {
-            // Ignored, we are simply running an old Java version
-        } catch (NoSuchMethodException e) {
-            // Ignored, we are simply running an old Java version
+        if (JavaVersion.current().isJava7Compatible()) {
+            ClassLoader.registerAsParallelCapable();
         }
     }
 
