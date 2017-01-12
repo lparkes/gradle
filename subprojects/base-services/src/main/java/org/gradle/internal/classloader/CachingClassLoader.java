@@ -18,10 +18,10 @@ package org.gradle.internal.classloader;
 
 import com.google.common.collect.MapMaker;
 
+import org.gradle.api.JavaVersion;
+
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ConcurrentMap;
 
 public class CachingClassLoader extends ClassLoader implements ClassLoaderHierarchy, Closeable {
@@ -33,18 +33,9 @@ public class CachingClassLoader extends ClassLoader implements ClassLoaderHierar
         /*
          * This classloader is thread-safe and ClassLoader is parallel capable,
          * so register as such to reduce contention when running multithreaded builds.
-         * We do so through relfection since Gradle should print error messages when
-         * run with older JRE versions
         */
-        try {
-            Method m = ClassLoader.class.getMethod("registerAsParallelCapable");
-            m.invoke(null);
-        } catch (InvocationTargetException e) {
-            // Ignored, we are simply running an old Java version
-        } catch (IllegalAccessException e) {
-            // Ignored, we are simply running an old Java version
-        } catch (NoSuchMethodException e) {
-            // Ignored, we are simply running an old Java version
+        if (JavaVersion.current().isJava7Compatible()) {
+            ClassLoader.registerAsParallelCapable();
         }
     }
 
