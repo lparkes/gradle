@@ -44,6 +44,7 @@ import org.gradle.api.internal.changedetection.state.InMemoryTaskArtifactCache;
 import org.gradle.api.internal.changedetection.state.JvmClassHasher;
 import org.gradle.api.internal.changedetection.state.OutputFilesSnapshotter;
 import org.gradle.api.internal.changedetection.state.PersistentCacheFileTimestampInspector;
+import org.gradle.api.internal.changedetection.state.TaskCacheKeyCalculator;
 import org.gradle.api.internal.changedetection.state.TaskHistoryRepository;
 import org.gradle.api.internal.changedetection.state.TaskHistoryStore;
 import org.gradle.api.internal.file.FileCollectionFactory;
@@ -60,6 +61,8 @@ import org.gradle.api.internal.tasks.execution.SkipEmptySourceFilesTaskExecuter;
 import org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter;
 import org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter;
 import org.gradle.api.internal.tasks.execution.SkipUpToDateTaskExecuter;
+import org.gradle.api.internal.tasks.execution.TaskCachingHashesListener;
+import org.gradle.api.internal.tasks.execution.TaskCachingHashesLogger;
 import org.gradle.api.internal.tasks.execution.TaskOutputsGenerationListener;
 import org.gradle.api.internal.tasks.execution.ValidatingTaskExecuter;
 import org.gradle.api.internal.tasks.execution.VerifyNoInputChangesTaskExecuter;
@@ -121,6 +124,7 @@ public class TaskExecutionServices {
                                             packer,
                                             taskOutputsGenerationListener,
                                             taskOutputOriginFactory,
+                                            listenerManager,
                                             createVerifyNoInputChangesExecuterIfNecessary(
                                                 repository,
                                                 new ExecuteActionsTaskExecuter(
@@ -139,9 +143,12 @@ public class TaskExecutionServices {
         );
     }
 
-    private static TaskExecuter createSkipCachedExecuterIfNecessary(StartParameter startParameter, BuildCacheConfigurationInternal buildCacheConfiguration, TaskOutputPacker packer, TaskOutputsGenerationListener taskOutputsGenerationListener, TaskOutputOriginFactory taskOutputOriginFactory, TaskExecuter delegate) {
+    private static TaskExecuter createSkipCachedExecuterIfNecessary(StartParameter startParameter, BuildCacheConfigurationInternal buildCacheConfiguration, TaskOutputPacker packer, TaskOutputsGenerationListener taskOutputsGenerationListener, TaskOutputOriginFactory taskOutputOriginFactory, ListenerManager listenerManager, TaskExecuter delegate) {
         if (startParameter.isTaskOutputCacheEnabled()) {
-            return new SkipCachedTaskExecuter(taskOutputOriginFactory, buildCacheConfiguration, packer, taskOutputsGenerationListener, delegate);
+            TaskCachingHashesListener hashesListener = listenerManager.getBroadcaster(TaskCachingHashesListener.class);
+            TaskCacheKeyCalculator taskCacheKeyCalculator = new TaskCacheKeyCalculator(hashesListener);
+            listenerManager.addListener(new TaskCachingHashesLogger());
+            return new SkipCachedTaskExecuter(taskOutputOriginFactory, buildCacheConfiguration, packer, taskOutputsGenerationListener, taskCacheKeyCalculator, delegate);
         } else {
             return delegate;
         }
@@ -149,7 +156,7 @@ public class TaskExecutionServices {
 
     private static TaskExecuter createVerifyNoInputChangesExecuterIfNecessary(TaskArtifactStateRepository repository, TaskExecuter delegate) {
         if (Boolean.getBoolean("org.gradle.tasks.verifyinputs")) {
-            return new VerifyNoInputChangesTaskExecuter(repository, delegate);
+            return new VerifyNoInputChangesTaskExecuter(repository, new TaskCacheKeyCalculator(), delegate);
         } else {
             return delegate;
         }
@@ -174,7 +181,7 @@ public class TaskExecutionServices {
     }
 
     GenericFileCollectionSnapshotter createGenericFileCollectionSnapshotter(FileHasher hasher, StringInterner stringInterner, FileSystem fileSystem, DirectoryFileTreeFactory directoryFileTreeFactory, FileSystemMirror fileSystemMirror) {
-        return new DefaultGenericFileCollectionSnapshotter(hasher, stringInterner, fileSystem, directoryFileTreeFactory,  fileSystemMirror);
+        return new DefaultGenericFileCollectionSnapshotter(hasher, stringInterner, fileSystem, directoryFileTreeFactory, fileSystemMirror);
     }
 
     ClasspathSnapshotter createClasspathSnapshotter(FileHasher hasher, StringInterner stringInterner, FileSystem fileSystem, DirectoryFileTreeFactory directoryFileTreeFactory, FileSystemMirror fileSystemMirror) {
