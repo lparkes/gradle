@@ -76,7 +76,7 @@ public class LocalDirectoryBuildCache implements BuildCache {
 
     @Override
     public boolean load(final BuildCacheKey key, final BuildCacheEntryReader reader) throws BuildCacheException {
-        return persistentCache.useCache("load build cache entry", new Factory<Boolean>() {
+        return persistentCache.useCache(new Factory<Boolean>() {
             @Override
             public Boolean create() {
                 File file = getFile(key.getHashCode());
@@ -101,7 +101,7 @@ public class LocalDirectoryBuildCache implements BuildCache {
 
     @Override
     public void store(final BuildCacheKey key, final BuildCacheEntryWriter result) throws BuildCacheException {
-        persistentCache.useCache("store build cache entry", new Runnable() {
+        persistentCache.useCache(new Runnable() {
             @Override
             public void run() {
                 File file = getFile(key.getHashCode());
@@ -126,7 +126,7 @@ public class LocalDirectoryBuildCache implements BuildCache {
 
     @Override
     public String getDescription() {
-        return "local directory cache in " + persistentCache.getBaseDir();
+        return "a local build cache (" + persistentCache.getBaseDir() + ")";
     }
 
     @Override

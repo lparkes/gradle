@@ -21,6 +21,7 @@ import org.gradle.cache.CacheRepository;
 import org.gradle.caching.BuildCache;
 import org.gradle.internal.concurrent.CompositeStoppable;
 import org.gradle.internal.concurrent.Stoppable;
+import org.gradle.util.SingleMessageLogger;
 
 import java.io.File;
 
@@ -77,9 +78,17 @@ public class DefaultBuildCacheConfiguration implements BuildCacheConfigurationIn
         // TODO:LPTR Instantiate this as a service instead
         if (cache == null) {
             this.cache = new LenientBuildCacheDecorator(
-                new ShortCircuitingErrorHandlerBuildCacheWrapper(3,
+                new ShortCircuitingErrorHandlerBuildCacheDecorator(3,
                     new LoggingBuildCacheDecorator(
-                        factory.createCache(startParameter))));
+                            factory.createCache(startParameter))));
+            if (isPullAllowed() && isPushAllowed()) {
+                SingleMessageLogger.incubatingFeatureUsed("Using " + cache.getDescription());
+            } else if (isPushAllowed()) {
+                SingleMessageLogger.incubatingFeatureUsed("Pushing task output to " + cache.getDescription());
+            } else if (isPullAllowed()) {
+                SingleMessageLogger.incubatingFeatureUsed("Retrieving task output from " + cache.getDescription());
+            }
+            // else, TODO: Misconfiguration? neither push nor pull is allowed
         }
         return cache;
     }

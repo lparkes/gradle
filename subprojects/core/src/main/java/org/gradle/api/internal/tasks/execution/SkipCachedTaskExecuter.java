@@ -17,7 +17,6 @@
 package org.gradle.api.internal.tasks.execution;
 
 import org.gradle.api.GradleException;
-import org.gradle.api.UncheckedIOException;
 import org.gradle.api.internal.TaskInternal;
 import org.gradle.api.internal.TaskOutputsInternal;
 import org.gradle.api.internal.changedetection.TaskArtifactState;
@@ -34,11 +33,9 @@ import org.gradle.caching.internal.tasks.TaskOutputPacker;
 import org.gradle.caching.internal.tasks.origin.TaskOutputOriginFactory;
 import org.gradle.internal.time.Timer;
 import org.gradle.internal.time.Timers;
-import org.gradle.util.SingleMessageLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -58,7 +55,6 @@ public class SkipCachedTaskExecuter implements TaskExecuter {
         this.packer = packer;
         this.taskOutputsGenerationListener = taskOutputsGenerationListener;
         this.delegate = delegate;
-        SingleMessageLogger.incubatingFeatureUsed("Task output caching");
     }
 
     @Override
@@ -97,11 +93,7 @@ public class SkipCachedTaskExecuter implements TaskExecuter {
                                     boolean found = getCache().load(cacheKey, new BuildCacheEntryReader() {
                                         @Override
                                         public void readFrom(final InputStream input) {
-                                            try {
-                                                packer.unpack(taskOutputs, input, taskOutputOriginFactory.createReader(task));
-                                            } catch (IOException e) {
-                                                throw new UncheckedIOException(e);
-                                            }
+                                            packer.unpack(taskOutputs, input, taskOutputOriginFactory.createReader(task));
                                             LOGGER.info("Unpacked output for {} from cache (took {}).", task, clock.getElapsed());
                                         }
                                     });
@@ -141,11 +133,7 @@ public class SkipCachedTaskExecuter implements TaskExecuter {
                         @Override
                         public void writeTo(OutputStream output) {
                             LOGGER.info("Packing {}", task.getPath());
-                            try {
-                                packer.pack(taskOutputs, output, taskOutputOriginFactory.createWriter(task, clock.getElapsedMillis()));
-                            } catch (IOException e) {
-                                throw new UncheckedIOException(e);
-                            }
+                            packer.pack(taskOutputs, output, taskOutputOriginFactory.createWriter(task, clock.getElapsedMillis()));
                         }
                     });
                 } else {
